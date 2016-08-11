@@ -34,11 +34,6 @@ AWSCognito.config.credentials = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: IdentityPoolId.AWSCognito
 });
 
-//    var cognitoidentity = new AWS.CognitoIdentity();
-//    cognitoidentity.getId(cogCredentials, function (err, id) {
-//        console.log( id );
-//    });
-
 var data = {
   UserPoolId: IdentityPoolId.AWSCognito,
   ClientId: ClientId

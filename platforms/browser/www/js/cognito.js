@@ -1,7 +1,7 @@
 var region = 'ap-northeast-1'; // 東京リージョン
 
 var IdentityPoolId = {
-  AWS: 'ap-northeast-1:4a0a8023-7770-499a-a92e-e8cd3d788871', // 'YOUR_IDENTITY_POOL_ID'
+  AWS: 'ap-northeast-1:4a0a8023-7770-499a-a92e-e8cd3d788871', // <YOUR_IDENTITY_POOL_ID>
   AWSCognito: 'ap-northeast-1_uSVyq55eG' // <YOUR_USER_POOL_ID>
 };
 
@@ -33,11 +33,6 @@ AWSCognito.config.region = region; // Region
 AWSCognito.config.credentials = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: IdentityPoolId.AWSCognito
 });
-
-//    var cognitoidentity = new AWS.CognitoIdentity();
-//    cognitoidentity.getId(cogCredentials, function (err, id) {
-//        console.log( id );
-//    });
 
 var data = {
   UserPoolId: IdentityPoolId.AWSCognito,
