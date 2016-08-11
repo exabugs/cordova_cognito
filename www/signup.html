@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8"/>
+    <title>GEEKLAB Joetsu</title>
+    <!-- aws sdk //-->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.3.8.min.js"></script>
+    <!-- aws cognito sdk (public beta!!) //-->
+    <script src="jsbn.js"></script>
+    <script src="jsbn2.js"></script>
+    <script src="sjcl.js"></script>
+    <script src="moment.min.js"></script>
+    <script src="aws-cognito-sdk.min.js"></script>
+    <script src="amazon-cognito-identity.min.js"></script>
+    <!-- jquery //-->
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"
+            integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <!-- bootstrap3 //-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+    <form>
+        <h2>サインアップ</h2>
+        <div id="message" class="alert" style="display:none;"></div>
+        <label for="inputUsername" class="sr-only">ユーザー名</label>
+        <input type="text" id="inputUsername" class="form-control" placeholder="User name" required autofocus></input>
+        <label for="inputPassword" class="sr-only">パスワード</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required></input>
+        <label for="inputEmail" class="sr-only">メールアドレス</label>
+        <input type="text" id="inputEmail" class="form-control" placeholder="EMail" required></input>
+        <label for="inputLocale" class="sr-only">ロケール</label>
+        <input type="text" id="inputLocale" class="form-control" placeholder="Locale" required></input>
+        <br/>
+        <input type="button" class="btn btn-lg btn-primary btn-bloc" id="user_add_btn" value="ユーザーを作成する"></input>
+    </form>
+
+    <form>
+        <h2>コンファーム</h2>
+        <div id="message2" class="alert" style="display:none;"></div>
+        <label for="inputUsername2" class="sr-only">ユーザー名</label>
+        <input type="text" id="inputUsername2" class="form-control" placeholder="User name" required autofocus></input>
+        <label for="inputVerificationCode" class="sr-only">コード</label>
+        <input type="text" id="inputVerificationCode" class="form-control" placeholder="Verification Code" required
+               autofocus></input>
+        <br/>
+        <input type="button" class="btn btn-lg btn-primary btn-bloc" id="user_confirm_btn" value="コンファーム"></input>
+    </form>
+
+    <form>
+        <h2>ログイン</h2>
+        <div id="message3" class="alert" style="display:none;"></div>
+        <label for="inputUsername3" class="sr-only">ユーザー名</label>
+        <input type="text" id="inputUsername3" class="form-control" placeholder="User name" required autofocus></input>
+        <label for="inputPassword3" class="sr-only">パスワード</label>
+        <input type="password" id="inputPassword3" class="form-control" placeholder="Password" required></input>
+        <br/>
+        <input type="button" class="btn btn-lg btn-primary btn-bloc" id="user_login_btn" value="ログイン"></input>
+    </form>
+
+
+</div>
+<script>
+    <!--
+    var region = 'ap-northeast-1'; // 東京リージョン
+
+    var IdentityPoolId = {
+        AWS: 'ap-northeast-1:4a0a8023-7770-499a-a92e-e8cd3d788871', // 'YOUR_IDENTITY_POOL_ID'
+        AWSCognito: 'ap-northeast-1_uSVyq55eG' // <YOUR_USER_POOL_ID>
+    };
+
+    var ClientId = '6elsp8qa9ecfbj8la64vrkr8ts'; // アプリID
+
+    ///////////////////
+
+    var idp = ['cognito-idp', region, 'amazonaws', 'com'].join(".");
+
+    var endpoint = [idp, IdentityPoolId.AWSCognito].join("/");
+
+    // Examples: Using the JavaScript SDK
+    // http://docs.aws.amazon.com/cognito/latest/developerguide/using-amazon-cognito-user-identity-pools-javascript-examples.html
+
+    // Source
+    // https://github.com/aws/amazon-cognito-identity-js
+
+    // Documents
+    // http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/CognitoIdentity.html
+
+    // Initialize the Amazon Cognito credentials provider
+    AWS.config.region = region; // Region
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: IdentityPoolId.AWS
+    });
+
+    // Initialize the Amazon Cognito credentials provider
+    AWSCognito.config.region = region; // Region
+    AWSCognito.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: IdentityPoolId.AWSCognito
+    });
+
+    //    var cognitoidentity = new AWS.CognitoIdentity();
+    //    cognitoidentity.getId(cogCredentials, function (err, id) {
+    //        console.log( id );
+    //    });
+
+    var data = {
+        UserPoolId: IdentityPoolId.AWSCognito,
+        ClientId: ClientId
+    };
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+
+    var cognitoUser;
+    //-->
+</script>
+<script>
+    <!--
+    function message(div, message_text, message_class) {
+        div.text(message_text);
+        div.addClass(message_class);
+        div.show();
+        setTimeout(function () {
+            div.fadeOut();
+            div.removeClass(message_class);
+        }, 5000);
+    }
+    // Use case 1. Registering a user with the application.
+    $('#user_add_btn').click(function () {
+        var username = $("#inputUsername").val();
+        var password = $("#inputPassword").val();
+
+        var email = $("#inputEmail").val();
+        var locale = $("#inputLocale").val();
+
+        var attributeList = [];
+        attributeList.push({Name: "email", Value: email});
+        attributeList.push({Name: "locale", Value: locale});
+
+        if (!username || !password) {
+            return false;
+        }
+
+        userPool.signUp(username, password, attributeList, null, function (err, result) {
+            if (err) {
+                console.log(err);
+                message($('#message'), err, "alert-danger");
+            } else {
+                cognitoUser = result.user;
+                console.log('user name is ' + cognitoUser.getUsername());
+                var message_text = cognitoUser.getUsername() + "が作成されました";
+                message($('#message'), message_text, "alert-success");
+            }
+        });
+    });
+
+    // Use case 2. Confirming a registered, unauthenticated user using a confirmation code received via e-mail.
+    $('#user_confirm_btn').click(function () {
+        var username = $("#inputUsername2").val();
+        var code = $("#inputVerificationCode").val();
+
+        var userData = {
+            Username: username,
+            Pool: userPool
+        };
+
+        console.log('Username: ' + username);
+        console.log('Confirm code: ' + code);
+
+        var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+        cognitoUser.confirmRegistration(code, true, function (err, result) {
+            if (err) {
+                console.log(err);
+                message($('#message2'), err, "alert-danger");
+            } else {
+                console.log('user name is ' + cognitoUser.username);
+                var message_text = "[" + result + "] " + cognitoUser.username + " が確認されました";
+                message($('#message2'), message_text, "alert-success");
+            }
+        });
+    });
+
+    // Use case 4. Authenticating a user and establishing a user session with the Amazon Cognito Identity service.
+    $('#user_login_btn').click(function () {
+        var username = $("#inputUsername3").val();
+        var password = $("#inputPassword3").val();
+
+        var authenticationData = {
+            Username: username,
+            Password: password
+        };
+        var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+
+        var userData = {
+            Username: username,
+            Pool: userPool
+        };
+        var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+        cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: function (result) {
+
+                var message_text = "[SUCCESS] " + cognitoUser.username + " が認証されました";
+                message($('#message3'), message_text, "alert-success");
+
+                var acToken = result.getAccessToken().getJwtToken();
+                var idToken = result.getIdToken().getJwtToken();
+                console.log('access token + ' + acToken);
+
+                var Logins = {};
+                Logins[endpoint] = idToken;
+
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: IdentityPoolId.AWS, // your identity pool id here
+                    Logins: Logins
+                });
+
+                // Instantiate aws sdk service objects now that the credentials have been updated.
+                // example: var s3 = new AWS.S3();
+
+            },
+
+            onFailure: function (err) {
+                alert(err);
+                message($('#message3'), err, "alert-danger");
+            }
+
+        });
+    });
+    //-->
+</script>
+</body>
+</html>
